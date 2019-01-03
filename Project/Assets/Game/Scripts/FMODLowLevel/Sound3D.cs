@@ -30,6 +30,9 @@ public class Sound3D : MonoBehaviour
     [Range(0f, 360f)] public float OutsideConeAngle = 360f;
     [Range(0f, 1f)] public float OutsideVolume = 1f;
 
+    [Header("Reverb Properties")]
+    public float ReverbWet;
+
     private float frequency;
 
     /// <summary>
@@ -249,6 +252,16 @@ public class Sound3D : MonoBehaviour
         LowLevelSystem.ERRCHECK(channel.set3DMinMaxDistance(MinDistance, MaxDistance));
     }
 
+    /// <summary>
+    /// Establece la Distancia a partir de la cual el sonido no se atenúa más
+    /// </summary>
+    /// <param name="maxDistance"></param>
+    private void SetReverbWet(float reverbWet)
+    {
+        ReverbWet = reverbWet;
+        LowLevelSystem.ERRCHECK(channel.setReverbProperties(0, ReverbWet));
+    }
+
     #endregion UpdateSetters
 
     #region Setters
@@ -325,6 +338,7 @@ public class Sound3D : MonoBehaviour
         SetOutsideVolume(OutsideVolume);
         SetMinDistance(MinDistance);
         SetMaxDistance(MaxDistance);
+        SetReverbWet(ReverbWet);
 
         UpdatePosition();
     }

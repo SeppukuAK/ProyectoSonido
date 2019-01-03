@@ -92,6 +92,17 @@ public class LowLevelSystem : MonoBehaviour
     }
 
     /// <summary>
+    /// Crea una reverb
+    /// </summary>
+    /// <returns></returns>
+    public FMOD.Reverb3D CreateReverb()
+    {
+        FMOD.Reverb3D reverb;
+        ERRCHECK(system.createReverb3D(out reverb));
+        return reverb;
+    }
+
+    /// <summary>
     /// TODO: Revisar
     /// Crea geometria
     /// </summary>

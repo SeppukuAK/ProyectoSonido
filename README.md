@@ -11,4 +11,8 @@ Si eso revisar el flujo
 
 30 -> Modelos de atenuación: RollOff
 
+35 -> Cosas rarisimas de reverb y convolución
+
+UNITY_EDITOR
+
 32/40
