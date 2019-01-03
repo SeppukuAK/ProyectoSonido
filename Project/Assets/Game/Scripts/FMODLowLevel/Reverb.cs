@@ -105,6 +105,7 @@ public class Reverb : MonoBehaviour
                 break;
         }
 
+
         LowLevelSystem.ERRCHECK(reverb.setProperties(ref reverbProperties));
 
         FMOD.VECTOR pos = new FMOD.VECTOR();
