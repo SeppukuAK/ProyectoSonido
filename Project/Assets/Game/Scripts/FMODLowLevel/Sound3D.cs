@@ -21,6 +21,10 @@ public class Sound3D : MonoBehaviour
     [Range(0f, 1f)] public float Volume = 1f;
     [Range(0f, 6f)] public float Pitch = 1f;
 
+    [Header("3D Sound Settings")]
+    public float MinDistance = 1f;       //Distancia a partir de la cual el sonido empieza a atenuarse
+    public float MaxDistance = 10000f;        //Distancia a partir de la cual el sonido no se atenúa más
+
     [Header("Sound Direction")]
     [Range(0f, 360f)] public float InsideConeAngle = 360f;
     [Range(0f, 360f)] public float OutsideConeAngle = 360f;
@@ -218,11 +222,31 @@ public class Sound3D : MonoBehaviour
     /// <summary>
     /// Establece el volumen fuera del cono exterior
     /// </summary>
-    /// <param name="pitch"></param>
+    /// <param name="outsideVolume"></param>
     private void SetOutsideVolume(float outsideVolume)
     {
         OutsideVolume = outsideVolume;
         LowLevelSystem.ERRCHECK(channel.set3DConeSettings(InsideConeAngle, OutsideConeAngle, OutsideVolume));
+    }
+
+    /// <summary>
+    /// Establece la Distancia a partir de la cual el sonido empieza a atenuarse
+    /// </summary>
+    /// <param name="minDistance"></param>
+    private void SetMinDistance(float minDistance)
+    {
+        MinDistance = minDistance;
+        LowLevelSystem.ERRCHECK(channel.set3DMinMaxDistance(MinDistance, MaxDistance));
+    }
+
+    /// <summary>
+    /// Establece la Distancia a partir de la cual el sonido no se atenúa más
+    /// </summary>
+    /// <param name="maxDistance"></param>
+    private void SetMaxDistance(float maxDistance)
+    {
+        MaxDistance = maxDistance;
+        LowLevelSystem.ERRCHECK(channel.set3DMinMaxDistance(MinDistance, MaxDistance));
     }
 
     #endregion UpdateSetters
@@ -296,6 +320,11 @@ public class Sound3D : MonoBehaviour
         SetLoop(Loop);
         SetVolume(Volume);
         SetPitch(Pitch);
+        SetInsideConeAngle(InsideConeAngle);
+        SetOutsideConeAngle(OutsideConeAngle);
+        SetOutsideVolume(OutsideVolume);
+        SetMinDistance(MinDistance);
+        SetMaxDistance(MaxDistance);
 
         UpdatePosition();
     }

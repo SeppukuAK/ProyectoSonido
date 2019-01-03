@@ -9,4 +9,6 @@ Si eso revisar el flujo
 25 -> Listener. Ya viene dado por studio. No deberia mirarlo
 26 -> Sonido estereo. No interesa creo
 
-30/40
+30 -> Modelos de atenuación: RollOff
+
+32/40
