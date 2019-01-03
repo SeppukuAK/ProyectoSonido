@@ -5,4 +5,8 @@ Progreso:
 Channel group lo dejamos para más tarde
 
 Si eso revisar el flujo
-24/40
+
+25 -> Listener. Ya viene dado por studio. No deberia mirarlo
+26 -> Sonido estereo. No interesa creo
+
+30/40

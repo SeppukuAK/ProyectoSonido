@@ -6,16 +6,7 @@
 /// </summary>
 public class LowLevelSystem : MonoBehaviour
 {
-    #region Singleton
-
     public static LowLevelSystem Instance;
-
-    private void Awake()
-    {
-        Instance = this;
-    }
-
-    #endregion Singleton
 
     /// <summary>
     /// Ruta donde se encuentran los archivos de audio de la escena
@@ -35,8 +26,10 @@ public class LowLevelSystem : MonoBehaviour
     /// <summary>
     /// Obtiene la instancia del LowLevelSystem
     /// </summary>
-    private void Start()
+    private void Awake()
     {
+        Instance = this;
+
         //LowLevel
         system = FMODUnity.RuntimeManager.LowlevelSystem;
         uint version;
@@ -62,6 +55,7 @@ public class LowLevelSystem : MonoBehaviour
         FMOD.Sound sound;
         //TODO: Solo va con .wav
         ERRCHECK(system.createSound(audioPath + name + ".wav", FMOD.MODE._3D | FMOD.MODE.LOOP_NORMAL, out sound));
+
         return sound;
     }
 
@@ -93,7 +87,7 @@ public class LowLevelSystem : MonoBehaviour
     public FMOD.ChannelGroup CreateChannelGroup(string name)
     {
         FMOD.ChannelGroup channelGroup;
-        ERRCHECK(system.createChannelGroup(name,out channelGroup));
+        ERRCHECK(system.createChannelGroup(name, out channelGroup));
         return channelGroup;
     }
 
@@ -110,6 +104,91 @@ public class LowLevelSystem : MonoBehaviour
         ERRCHECK(system.createGeometry(maxPoligons, maxVertex, out geometry));
         return geometry;
     }
+
+    #region System parameters
+
+    /// <summary>
+    /// Devuelve la variación de frecuencia por la velocidad
+    /// 1.0 = valor natural
+    /// 0.0 = Lo anula
+    /// >1.0 => Exagera el fenómeno 
+    /// </summary>
+    /// <returns></returns>
+    public float GetDopplerScale()
+    {
+        float dopplerScale, distanceFactor, rollOffScale;
+        ERRCHECK(system.get3DSettings(out dopplerScale, out distanceFactor, out rollOffScale));
+        return dopplerScale;
+    }
+
+    /// <summary>
+    /// Devuelve las dimensiones del escenario de cara al motor de sonido
+    /// 1.0 = valor natural
+    /// 0.0 = Lo anula
+    /// >1.0 => Exagera el fenómeno 
+    /// </summary>
+    /// <returns></returns>
+    public float GetDistanceFactor()
+    {
+        float dopplerScale, distanceFactor, rollOffScale;
+        ERRCHECK(system.get3DSettings(out dopplerScale, out distanceFactor, out rollOffScale));
+        return distanceFactor;
+    }
+
+    /// <summary>
+    /// Devuelve la atenuación con la distancia
+    /// 1.0 = valor natural
+    /// 0.0 = Lo anula
+    /// >1.0 => Exagera el fenómeno 
+    /// </summary>
+    /// <returns></returns>
+    public float GetRollOffScale()
+    {
+        float dopplerScale, distanceFactor, rollOffScale;
+        ERRCHECK(system.get3DSettings(out dopplerScale, out distanceFactor, out rollOffScale));
+        return rollOffScale;
+    }
+
+    /// <summary>
+    /// Establece la variación de frecuencia por la velocidad
+    /// </summary>
+    /// <param name="dopplerScale">   
+    /// 1.0 = valor natural
+    /// 0.0 = Lo anula
+    /// >1.0 => Exagera el fenómeno 
+    /// </param>
+    public void SetDopplerScale(float dopplerScale)
+    {
+        ERRCHECK(system.set3DSettings(dopplerScale, GetDistanceFactor(), GetRollOffScale()));
+    }
+
+    /// <summary>
+    /// Establece las dimensiones del escenario de cara al motor de sonido
+    /// </summary>
+    /// <param name="rollOffScale">   
+    /// 1.0 = valor natural
+    /// 0.0 = Lo anula
+    /// >1.0 => Exagera el fenómeno 
+    /// </param>
+    public void SetDistanceFactor(float distanceFactor)
+    {
+        ERRCHECK(system.set3DSettings(GetDopplerScale(), distanceFactor, GetRollOffScale()));
+    }
+
+    /// <summary>
+    /// Establece la atenuación con la distancia
+    /// </summary>
+    /// <param name="rollOffScale">   
+    /// 1.0 = valor natural
+    /// 0.0 = Lo anula
+    /// >1.0 => Exagera el fenómeno 
+    /// </param>
+    public void SetRollOffScale(float rollOffScale)
+    {
+        ERRCHECK(system.set3DSettings(GetDopplerScale(), GetDistanceFactor(), rollOffScale));
+    }
+
+    #endregion System parameters
 
     /// <summary>
     /// Facilita la gestión de errores

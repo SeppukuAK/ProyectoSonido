@@ -12,8 +12,21 @@ public class Sound3D : MonoBehaviour
     /// Pista de audio que reproduce
     /// </summary>
     public AudioClip Clip;
-    public bool PlayOnAwake;
-    public bool Loop;
+
+    //Atributos del canal
+    public bool Mute = false;
+    public bool PlayOnAwake = true;
+    public bool Loop = false;
+
+    [Range(0f, 1f)] public float Volume = 1f;
+    [Range(0f, 6f)] public float Pitch = 1f;
+
+    [Header("Sound Direction")]
+    [Range(0f, 360f)] public float InsideConeAngle = 360f;
+    [Range(0f, 360f)] public float OutsideConeAngle = 360f;
+    [Range(0f, 1f)] public float OutsideVolume = 1f;
+
+    private float frequency;
 
     /// <summary>
     /// Unifica el tratamiento de los diferentes formatos de sonido
@@ -31,18 +44,28 @@ public class Sound3D : MonoBehaviour
     private SoundState currentState;
 
     /// <summary>
+    /// Posición en el anterior frame del sonido
+    /// </summary>
+    private FMOD.VECTOR lastPos;
+
+    /// <summary>
     /// Carga el sonido, crea el canal, inicializa su estado
     /// </summary>
     private void Start()
     {
         sound = LowLevelSystem.Instance.Create3DSound(Clip.name);
-        channel = LowLevelSystem.Instance.CreateChannel(sound);       
+        channel = LowLevelSystem.Instance.CreateChannel(sound);
         currentState = SoundState.READY;
+
+        lastPos = new FMOD.VECTOR();
+        lastPos.x = transform.position.x;
+        lastPos.y = transform.position.y;
+        lastPos.z = transform.position.z;
+
+        LowLevelSystem.ERRCHECK(channel.getFrequency(out frequency));
 
         if (PlayOnAwake)
             Play();
-
-        SetLoop(Loop);
     }
 
     #region Flow
@@ -122,30 +145,98 @@ public class Sound3D : MonoBehaviour
         return channel.isPlaying(out playing) == FMOD.RESULT.ERR_INVALID_HANDLE;
     }
 
-    /// <summary>
-    /// Devuelve el volumen del sonido.
-    /// Un valor entre 0.0f y 1.0f
-    /// </summary>
-    /// <returns></returns>
-    public float GetVolume()
-    {
-        float volume;
-        LowLevelSystem.ERRCHECK(channel.getVolume(out volume));
-        return volume;
-    }
-
     #endregion Getters
 
-    #region Setters
+    #region UpdateSetters
+
+    /// <summary>
+    /// Silencia el sonido o le pone volumen previo a ser muteado
+    /// </summary>
+    /// <param name="muted"></param>
+    private void SetMuted(bool muted)
+    {
+        Mute = muted;
+        LowLevelSystem.ERRCHECK(channel.setMute(Mute));
+    }
+
+    /// <summary>
+    /// Establece el número de veces que tiene que reproducirse en loop
+    /// -1 para infinito
+    /// </summary>
+    /// <param name="loop"></param>
+    private void SetLoop(bool loop)
+    {
+        Loop = loop;
+
+        if (loop)
+            LowLevelSystem.ERRCHECK(channel.setLoopCount(-1));
+        else
+            LowLevelSystem.ERRCHECK(channel.setLoopCount(0));
+    }
 
     /// <summary>
     /// Establece el volumen del sonido
     /// Valor entre 0.0 y 1.0
     /// </summary>
     /// <param name="volume"></param>
-    public void SetVolume(float volume)
+    private void SetVolume(float volume)
     {
-        LowLevelSystem.ERRCHECK(channel.setVolume(volume));
+        Volume = volume;
+        LowLevelSystem.ERRCHECK(channel.setVolume(Volume));
+    }
+
+    /// <summary>
+    /// Establece el pitch del sonido
+    /// </summary>
+    /// <param name="pitch"></param>
+    private void SetPitch(float pitch)
+    {
+        Pitch = pitch;
+        LowLevelSystem.ERRCHECK(channel.setPitch(Pitch));
+    }
+
+    /// <summary>
+    /// Establece el angulo del cono interior: donde no hay atenuación por dirección
+    /// </summary>
+    /// <param name="insideConeAngle"></param>
+    private void SetInsideConeAngle(float insideConeAngle)
+    {
+        InsideConeAngle = insideConeAngle;
+        LowLevelSystem.ERRCHECK(channel.set3DConeSettings(InsideConeAngle, OutsideConeAngle, OutsideVolume));
+    }
+
+    /// <summary>
+    /// Establece el ángulo del cono exterior: donde el sonido se atenúa
+    /// </summary>
+    /// <param name="outsideConeAngle"></param>
+    private void SetOutsideConeAngle(float outsideConeAngle)
+    {
+        OutsideConeAngle = outsideConeAngle;
+        LowLevelSystem.ERRCHECK(channel.set3DConeSettings(InsideConeAngle, OutsideConeAngle, OutsideVolume));
+    }
+
+    /// <summary>
+    /// Establece el volumen fuera del cono exterior
+    /// </summary>
+    /// <param name="pitch"></param>
+    private void SetOutsideVolume(float outsideVolume)
+    {
+        OutsideVolume = outsideVolume;
+        LowLevelSystem.ERRCHECK(channel.set3DConeSettings(InsideConeAngle, OutsideConeAngle, OutsideVolume));
+    }
+
+    #endregion UpdateSetters
+
+    #region Setters
+
+    /// <summary>
+    /// Establece la frecuencia del sonido
+    /// </summary>
+    /// <param name="newFrequency"></param>
+    public void SetFrequency(float newFrequency)
+    {
+        frequency = newFrequency;
+        LowLevelSystem.ERRCHECK(channel.setFrequency(frequency));
     }
 
     /// <summary>
@@ -158,48 +249,6 @@ public class Sound3D : MonoBehaviour
     }
 
     /// <summary>
-    /// Establece el número de veces que tiene que reproducirse en loop
-    /// -1 para infinito
-    /// </summary>
-    /// <param name="loop"></param>
-    public void SetLoop(bool loop)
-    {
-        Loop = loop;
-
-        if (loop)
-            LowLevelSystem.ERRCHECK(channel.setLoopCount(-1));
-        else
-            LowLevelSystem.ERRCHECK(channel.setLoopCount(0));
-    }
-
-    /// <summary>
-    /// Silencia el sonido o le pone volumen previo a ser muteado
-    /// </summary>
-    /// <param name="muted"></param>
-    public void SetMuted(bool muted)
-    {
-        LowLevelSystem.ERRCHECK(channel.setMute(muted));
-    }
-
-    /// <summary>
-    /// Establece el pitch del sonido
-    /// </summary>
-    /// <param name="pitch"></param>
-    public void SetPitch(float pitch)
-    {
-        LowLevelSystem.ERRCHECK(channel.setPitch(pitch));
-    }
-
-    /// <summary>
-    /// Establece la frecuencia del sonido
-    /// </summary>
-    /// <param name="frequency"></param>
-    public void SetFrequency(float frequency)
-    {
-        LowLevelSystem.ERRCHECK(channel.setFrequency(frequency));
-    }
-
-    /// <summary>
     /// TODO: Revisar
     /// Asocia el canal a un grupo
     /// </summary>
@@ -209,7 +258,7 @@ public class Sound3D : MonoBehaviour
         LowLevelSystem.ERRCHECK(channel.setChannelGroup(channelGroup));
     }
 
-    #endregion setters
+    #endregion Setters
 
     /// <summary>
     /// Controla el flujo de estados
@@ -227,22 +276,14 @@ public class Sound3D : MonoBehaviour
 
             case SoundState.PLAYING:
                 if (HasEnded())
-                {
-                    channel = LowLevelSystem.Instance.CreateChannel(sound);
-                    SetLoop(Loop);
-                    currentState = SoundState.READY;
-                }
+                    ResetChannel();
                 else if (IsPaused())
                     currentState = SoundState.PAUSED;
 
                 break;
             case SoundState.PAUSED:
                 if (HasEnded())
-                {
-                    channel = LowLevelSystem.Instance.CreateChannel(sound);
-                    SetLoop(Loop);
-                    currentState = SoundState.READY;
-                }
+                    ResetChannel();
                 else if (!IsPaused())
                     currentState = SoundState.PLAYING;
 
@@ -250,23 +291,41 @@ public class Sound3D : MonoBehaviour
 
         }
 
+        //Update de los atributos
+        SetMuted(Mute);
+        SetLoop(Loop);
+        SetVolume(Volume);
+        SetPitch(Pitch);
+
         UpdatePosition();
     }
 
     /// <summary>
-    /// Actualiza la posición del sonido a la del objeto
+    /// Crea un nuevo canal con los parámetros del anterior
+    /// </summary>
+    private void ResetChannel()
+    {
+        channel = LowLevelSystem.Instance.CreateChannel(sound);
+        currentState = SoundState.READY;
+        SetFrequency(frequency);
+    }
+
+    /// <summary>
+    /// Actualiza la posición y la velocidad del sonido a la del objeto
     /// </summary>
     private void UpdatePosition()
     {
-        FMOD.VECTOR pos = new FMOD.VECTOR(); // posicion del listener
+        FMOD.VECTOR pos = new FMOD.VECTOR();
         pos.x = transform.position.x;
         pos.y = transform.position.y;
         pos.z = transform.position.z;
 
-        FMOD.VECTOR vel = new FMOD.VECTOR(); // velocidad del listener
-        vel.x = 0;
-        vel.y = 0;
-        vel.z = 0;
+        FMOD.VECTOR vel = new FMOD.VECTOR();
+        vel.x = (pos.x - lastPos.x) * Time.deltaTime;
+        vel.y = (pos.y - lastPos.y) * Time.deltaTime;
+        vel.z = (pos.z - lastPos.z) * Time.deltaTime;
+
+        lastPos = pos;
 
         FMOD.VECTOR alt_pan_pos = new FMOD.VECTOR(); // vector up: hacia la ``coronilla''
         alt_pan_pos.x = transform.forward.x;
