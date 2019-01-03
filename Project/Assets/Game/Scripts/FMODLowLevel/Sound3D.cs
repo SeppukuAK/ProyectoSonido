@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// Controla parámetros del canal de reproducción
@@ -72,7 +73,17 @@ public class Sound3D : MonoBehaviour
         LowLevelSystem.ERRCHECK(channel.getFrequency(out frequency));
 
         if (PlayOnAwake)
-            Play();
+            StartCoroutine(PlayOnAwakeDelay());
+    }
+    
+    /// <summary>
+    /// Delay para que le de tiempo a que le afecte el escenario
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator PlayOnAwakeDelay()
+    {
+        yield return new WaitForSeconds(0.1f);
+        Play();
     }
 
     #region Flow

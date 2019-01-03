@@ -17,9 +17,6 @@ public class AudioGeometryBox : MonoBehaviour
     private int maxPoligons, maxVertices;
     private BoxCollider boxCollider;
 
-    /// <summary>
-    /// Crea la geometria
-    /// </summary>
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();
@@ -35,7 +32,6 @@ public class AudioGeometryBox : MonoBehaviour
     /// </summary>
     private void UpdateGeometryTransform()
     {
-
         FMOD.VECTOR pos = new FMOD.VECTOR();
         pos.x = transform.position.x;
         pos.y = transform.position.y;
@@ -62,6 +58,7 @@ public class AudioGeometryBox : MonoBehaviour
 
         LowLevelSystem.ERRCHECK(geometry.setScale(ref scale));
     }
+
     /// <summary>
     /// Se crea la geometría del cubo
     /// </summary>
@@ -82,13 +79,13 @@ public class AudioGeometryBox : MonoBehaviour
         Faces[4] = new FMOD.VECTOR[] { vertexCollider[3], vertexCollider[2], vertexCollider[6], vertexCollider[7] };
         Faces[5] = new FMOD.VECTOR[] { vertexCollider[1], vertexCollider[0], vertexCollider[4], vertexCollider[5] };
 
-
         geometry = LowLevelSystem.Instance.CreateGeometry(maxPoligons, maxVertices* maxPoligons);
 
         int polygonIndex; // Indice al poligono generado para referenciarlo despues
         for (int i = 0; i < maxPoligons; i++)       
             LowLevelSystem.ERRCHECK(geometry.addPolygon(DirectOcclusion, ReverbOcclusion, DoubleSided, maxVertices, Faces[i], out polygonIndex));
-        
+
+        UpdateGeometryTransform();
     }
 
     /// <summary>
@@ -100,8 +97,8 @@ public class AudioGeometryBox : MonoBehaviour
     {
         FMOD.VECTOR fmodVector = new FMOD.VECTOR();
         fmodVector.x = v.x;
-        fmodVector.x = v.y;
-        fmodVector.x = v.z;
+        fmodVector.y = v.y;
+        fmodVector.z = v.z;
 
         return fmodVector;
     }
