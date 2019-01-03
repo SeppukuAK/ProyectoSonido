@@ -43,7 +43,7 @@ public class LowLevelSystem : MonoBehaviour
     {
         FMOD.Sound sound;
         //TODO: COMPROBAR
-        ERRCHECK(system.createSound("Assets/" + name + ".wav", FMOD.MODE._3D | FMOD.MODE.LOOP_NORMAL, out sound));
+        ERRCHECK(system.createSound("Assets/Game/Audio" + name + ".wav", FMOD.MODE._3D | FMOD.MODE.LOOP_NORMAL, out sound));
         return sound;
     }
 
