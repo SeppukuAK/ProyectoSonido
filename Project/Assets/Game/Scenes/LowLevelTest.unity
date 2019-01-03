@@ -633,7 +633,7 @@ Prefab:
     - target: {fileID: 114344512770074094, guid: c8da8a177172b3647a513fb5ad21490e,
         type: 2}
       propertyPath: preset
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c8da8a177172b3647a513fb5ad21490e, type: 2}
