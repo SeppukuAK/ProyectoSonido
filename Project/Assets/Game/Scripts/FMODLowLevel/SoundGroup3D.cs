@@ -2,11 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// TODO: ESTA MIERDA
+/// </summary>
 public class SoundGroup3D : MonoBehaviour
 {
     public string GroupName;
     public Sound3D[] Sounds;
 
+    /// <summary>
+    /// : permite agrupar
+    ///canales y obtener/modificar parámetros para todos ellos
+    /// simultáneamente
+    /// </summary>
     private FMOD.ChannelGroup channelGroup;
 
     /// <summary>

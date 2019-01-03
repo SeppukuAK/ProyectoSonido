@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 
 public class TestSound : MonoBehaviour {
-
-    public SoundGroup3D SoundGroup3D;
     public Sound3D MySound;
 
 	void Update () {
@@ -15,13 +13,5 @@ public class TestSound : MonoBehaviour {
             MySound.Resume();
         else if (Input.GetKeyDown(KeyCode.R))
             MySound.Stop();
-
-        else if (Input.GetKeyDown(KeyCode.A))
-            SoundGroup3D.Resume();
-
-        else if (Input.GetKeyDown(KeyCode.S))
-            SoundGroup3D.Pause();
-
-
     }
 }

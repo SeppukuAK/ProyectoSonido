@@ -6,21 +6,37 @@
 /// </summary>
 public class LowLevelSystem : MonoBehaviour
 {
+    #region Singleton
+
     public static LowLevelSystem Instance;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    #endregion Singleton
+
+    /// <summary>
+    /// Ruta donde se encuentran los archivos de audio de la escena
+    /// </summary>
+    [SerializeField] private string audioPath;
 
     /// <summary>
     /// Instancia de LowLevelSystem
     /// </summary>
     private FMOD.System system;
+
+    /// <summary>
+    /// Canal padre de todos
+    /// </summary>
     private FMOD.ChannelGroup masterChannel;
 
     /// <summary>
     /// Obtiene la instancia del LowLevelSystem
     /// </summary>
-    private void Awake()
+    private void Start()
     {
-        Instance = this;
-
         //LowLevel
         system = FMODUnity.RuntimeManager.LowlevelSystem;
         uint version;
@@ -28,9 +44,11 @@ public class LowLevelSystem : MonoBehaviour
         Debug.Log("LowLevelSystem version: " + version);
     }
 
-    void Update()
+    /// <summary>
+    /// TODO: Update del system. Revisar si hace falta
+    /// </summary>
+    private void Update()
     {
-        //TODO: REVISAR SI HACE FALTA
         ERRCHECK(system.update());
     }
 
@@ -42,15 +60,14 @@ public class LowLevelSystem : MonoBehaviour
     public FMOD.Sound Create3DSound(string name)
     {
         FMOD.Sound sound;
-        //TODO: COMPROBAR
-        ERRCHECK(system.createSound("Assets/Game/Audio" + name + ".wav", FMOD.MODE._3D | FMOD.MODE.LOOP_NORMAL, out sound));
+        //TODO: Solo va con .wav
+        ERRCHECK(system.createSound(audioPath + name + ".wav", FMOD.MODE._3D | FMOD.MODE.LOOP_NORMAL, out sound));
         return sound;
     }
 
-    #region Channel
-
     /// <summary>
     /// Crea un canal asociado al sonido
+    /// Arranca en pause para dejarlo disponible en memoria
     /// </summary>
     /// <param name="sound"></param>
     /// <returns></returns>
@@ -80,8 +97,13 @@ public class LowLevelSystem : MonoBehaviour
         return channelGroup;
     }
 
-    #endregion Channel
-
+    /// <summary>
+    /// TODO: Revisar
+    /// Crea geometria
+    /// </summary>
+    /// <param name="maxPoligons"></param>
+    /// <param name="maxVertex"></param>
+    /// <returns></returns>
     public FMOD.Geometry CreateGeometry(int maxPoligons, int maxVertex)
     {
         FMOD.Geometry geometry;

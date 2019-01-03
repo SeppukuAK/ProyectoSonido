@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Simulación de recintos acústicos con obstrucción, oclusión, etc.
+/// </summary>
 [RequireComponent(typeof(BoxCollider))]
 public class AudioGeometryBox : MonoBehaviour
 {

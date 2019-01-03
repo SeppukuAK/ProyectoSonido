@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Unifica el tratamiento de los diferentes formatos de sonido.
 /// Controla parámetros del canal de reproducción
+/// Tiene una posición en el espacio
 /// </summary>
 public class Sound3D : MonoBehaviour
 {
     private enum SoundState { READY, PLAYING, PAUSED }
-    private SoundState currentState;
 
     /// <summary>
     /// Pista de audio que reproduce
@@ -16,11 +15,23 @@ public class Sound3D : MonoBehaviour
     public bool PlayOnAwake;
     public bool Loop;
 
+    /// <summary>
+    /// Unifica el tratamiento de los diferentes formatos de sonido
+    /// </summary>
     private FMOD.Sound sound;
+
+    /// <summary>
+    /// Controla parámetros del canal
+    /// </summary>
     private FMOD.Channel channel;
 
     /// <summary>
-    /// Carga el sonido
+    /// Estado actual de la reproducción
+    /// </summary>
+    private SoundState currentState;
+
+    /// <summary>
+    /// Carga el sonido, crea el canal, inicializa su estado
     /// </summary>
     private void Start()
     {
@@ -34,6 +45,7 @@ public class Sound3D : MonoBehaviour
         SetLoop(Loop);
     }
 
+    #region Flow
     /// <summary>
     /// Reproduce el sonido
     /// </summary>
@@ -48,6 +60,7 @@ public class Sound3D : MonoBehaviour
 
     /// <summary>
     /// Para el sonido si está reproduciendose o pausado
+    /// Se libera el canal 
     /// </summary>
     public void Stop()
     {
@@ -72,6 +85,8 @@ public class Sound3D : MonoBehaviour
         if (currentState == SoundState.PAUSED)
             LowLevelSystem.ERRCHECK(channel.setPaused(false));
     }
+
+    #endregion Flow
 
     #region Getters
 
@@ -185,6 +200,7 @@ public class Sound3D : MonoBehaviour
     }
 
     /// <summary>
+    /// TODO: Revisar
     /// Asocia el canal a un grupo
     /// </summary>
     /// <param name="channelGroup"></param>
@@ -192,6 +208,7 @@ public class Sound3D : MonoBehaviour
     {
         LowLevelSystem.ERRCHECK(channel.setChannelGroup(channelGroup));
     }
+
     #endregion setters
 
     /// <summary>
@@ -233,7 +250,7 @@ public class Sound3D : MonoBehaviour
 
         }
 
-        //UpdatePosition();
+        UpdatePosition();
     }
 
     /// <summary>
