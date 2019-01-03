@@ -58,7 +58,6 @@ public class LowLevelSystem : MonoBehaviour
 
         return sound;
     }
-
     /// <summary>
     /// Crea un canal asociado al sonido
     /// Arranca en pause para dejarlo disponible en memoria
@@ -103,7 +102,6 @@ public class LowLevelSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// TODO: Revisar
     /// Crea geometria
     /// </summary>
     /// <param name="maxPoligons"></param>
@@ -114,6 +112,18 @@ public class LowLevelSystem : MonoBehaviour
         FMOD.Geometry geometry;
         ERRCHECK(system.createGeometry(maxPoligons, maxVertex, out geometry));
         return geometry;
+    }
+
+    /// <summary>
+    /// Crea un DSP
+    /// </summary>
+    /// <param name="DSPType"></param>
+    /// <returns></returns>
+    public FMOD.DSP CreateDSP(FMOD.DSP_TYPE DSPType)
+    {
+        FMOD.DSP dsp;
+        ERRCHECK(system.createDSPByType(DSPType, out dsp));
+        return dsp;
     }
 
     #region System parameters

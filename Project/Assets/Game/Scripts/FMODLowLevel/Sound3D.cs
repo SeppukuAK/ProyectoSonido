@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+
 
 /// <summary>
 /// Controla parámetros del canal de reproducción
@@ -18,7 +20,7 @@ public class Sound3D : MonoBehaviour
     public bool Mute = false;
     public bool PlayOnAwake = true;
     public bool Loop = false;
-
+    
     [Range(0f, 1f)] public float Volume = 1f;
     [Range(0f, 6f)] public float Pitch = 1f;
 
@@ -35,6 +37,7 @@ public class Sound3D : MonoBehaviour
     public float ReverbWet;
 
     private float frequency;
+    private List<FMOD.DSP> DSPList;
 
     /// <summary>
     /// Unifica el tratamiento de los diferentes formatos de sonido
@@ -64,12 +67,13 @@ public class Sound3D : MonoBehaviour
         sound = LowLevelSystem.Instance.Create3DSound(Clip.name);
         channel = LowLevelSystem.Instance.CreateChannel(sound);
         currentState = SoundState.READY;
-
+        DSPList = new List<FMOD.DSP>();
+       
         lastPos = new FMOD.VECTOR();
         lastPos.x = transform.position.x;
         lastPos.y = transform.position.y;
         lastPos.z = transform.position.z;
-
+        
         LowLevelSystem.ERRCHECK(channel.getFrequency(out frequency));
 
         if (PlayOnAwake)
@@ -288,6 +292,16 @@ public class Sound3D : MonoBehaviour
     }
 
     /// <summary>
+    /// Añade un DSP al canal
+    /// </summary>
+    /// <param name="DSP"></param>
+    public void AddDSP(FMOD.DSP DSP)
+    {
+        DSPList.Add(DSP);
+        LowLevelSystem.ERRCHECK(channel.addDSP(DSPList.IndexOf(DSP), DSP ));
+    }
+
+    /// <summary>
     /// Establece la posición de reproducción de la pista en milisegundos
     /// </summary>
     /// <param name="position"></param>
@@ -362,6 +376,11 @@ public class Sound3D : MonoBehaviour
         channel = LowLevelSystem.Instance.CreateChannel(sound);
         currentState = SoundState.READY;
         SetFrequency(frequency);
+
+        //Se vuelven a añadir todos los efectos al canal
+        foreach (FMOD.DSP dsp in DSPList)      
+            LowLevelSystem.ERRCHECK(channel.addDSP(DSPList.IndexOf(dsp), dsp));
+        
     }
 
     /// <summary>
