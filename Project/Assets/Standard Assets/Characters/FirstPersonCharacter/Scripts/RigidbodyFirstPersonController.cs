@@ -21,7 +21,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             [HideInInspector] public float CurrentTargetSpeed = 8f;
 
 #if !MOBILE_INPUT
-            private bool m_Running;
+            protected bool m_Running;
 #endif
 
             public void UpdateDesiredTargetSpeed(Vector2 input)
@@ -126,7 +126,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
 
-        protected void Update()
+        protected virtual void Update()
         {
             RotateView();
 
@@ -137,7 +137,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
 
-        protected void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             GroundCheck();
             Vector2 input = GetInput();
@@ -241,7 +241,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
         /// sphere cast down just beyond the bottom of the capsule to see if the capsule is colliding round the bottom
-        protected void GroundCheck()
+        protected virtual void GroundCheck()
         {
             m_PreviouslyGrounded = m_IsGrounded;
             RaycastHit hitInfo;
