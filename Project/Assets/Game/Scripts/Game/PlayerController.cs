@@ -16,14 +16,19 @@ public class PlayerController : UnityStandardAssets.Characters.FirstPerson.Rigid
     {
         RotateView();
 
+        //Jumping
         if (m_IsGrounded && CrossPlatformInputManager.GetButtonDown("Jump") && !m_Jump)
         {
             m_Jump = true;
             jumpSound.Play();
         }
 
+        //Landing
+        else if (!m_PreviouslyGrounded && m_IsGrounded)
+            landSound.Play();
 
-        if (m_IsGrounded)
+        //Walking
+        else if (m_IsGrounded)
         {
             float velocity = m_RigidBody.velocity.magnitude;
 
@@ -38,8 +43,27 @@ public class PlayerController : UnityStandardAssets.Characters.FirstPerson.Rigid
                 footstepProgress = 0;
             }
         }
+
+        CheckInteraction();
     }
 
+    private void CheckInteraction()
+    {
+        if (CrossPlatformInputManager.GetButtonDown("Interact"))
+        {
+            RaycastHit hit;
+            // Does the ray intersect any objects excluding the player layer
+            if (Physics.Raycast(cam.transform.position, transform.TransformDirection(Vector3.forward), out hit, 3f))
+            {
+                if (hit.collider.GetComponent<Interactable>())
+                {
+                    hit.collider.GetComponent<Interactable>().Interact();
+                    Debug.Log("Did Hit");
+                }
+            }
+        }
+
+    }
 
     protected override void FixedUpdate()
     {
@@ -48,30 +72,6 @@ public class PlayerController : UnityStandardAssets.Characters.FirstPerson.Rigid
         if (m_IsGrounded)      
             footstepProgress += m_RigidBody.velocity.magnitude;
         
-    }
-
-
-    /// sphere cast down just beyond the bottom of the capsule to see if the capsule is colliding round the bottom
-    protected override void GroundCheck()
-    {
-        m_PreviouslyGrounded = m_IsGrounded;
-        RaycastHit hitInfo;
-        if (Physics.SphereCast(transform.position, m_Capsule.radius * (1.0f - advancedSettings.shellOffset), Vector3.down, out hitInfo,
-                               ((m_Capsule.height / 2f) - m_Capsule.radius) + advancedSettings.groundCheckDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore))
-        {
-            m_IsGrounded = true;
-            m_GroundContactNormal = hitInfo.normal;
-        }
-        else
-        {
-            m_IsGrounded = false;
-            m_GroundContactNormal = Vector3.up;
-        }
-        if (!m_PreviouslyGrounded && m_IsGrounded && m_Jumping)
-        {
-            m_Jumping = false;
-            landSound.Play();
-        }
     }
 
 }

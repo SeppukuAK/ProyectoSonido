@@ -241,7 +241,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
         /// sphere cast down just beyond the bottom of the capsule to see if the capsule is colliding round the bottom
-        protected virtual void GroundCheck()
+        protected void GroundCheck()
         {
             m_PreviouslyGrounded = m_IsGrounded;
             RaycastHit hitInfo;
