@@ -45,12 +45,16 @@ public class AudioGeometryBox : MonoBehaviour
         for (int i = 0; i < maxPoligons; i++)
             LowLevelSystem.ERRCHECK(geometry.addPolygon(DirectOcclusion, ReverbOcclusion, DoubleSided, maxVertices, Faces[i], out polygonIndex));
 
-        UpdateGeometryTransform();
     }
 
     private void Update()
     {
         UpdateGeometryTransform();
+    }
+
+    private void OnDestroy()
+    {
+        geometry.setActive(false);
     }
 
     /// <summary>
@@ -67,25 +71,17 @@ public class AudioGeometryBox : MonoBehaviour
 
         FMOD.VECTOR forward = new FMOD.VECTOR();
         forward.x = transform.forward.x;
-        forward.y = transform.forward.y; 
+        forward.y = transform.forward.y;
         forward.z = transform.forward.z;
 
         FMOD.VECTOR up = new FMOD.VECTOR();
         up.x = transform.up.x;
-        up.y = transform.up.y; 
+        up.y = transform.up.y;
         up.z = transform.up.z;
 
         LowLevelSystem.ERRCHECK(geometry.setRotation(ref forward, ref up));
 
-        FMOD.VECTOR scale = new FMOD.VECTOR();
-        scale.x = transform.lossyScale.x;
-        scale.y = transform.lossyScale.y;
-        scale.z = transform.lossyScale.z;
-
-        LowLevelSystem.ERRCHECK(geometry.setScale(ref scale));
     }
-
-
 
     /// <summary>
     /// Realiza la conversión de Vector3 a FMOD.VECTOR
@@ -95,10 +91,10 @@ public class AudioGeometryBox : MonoBehaviour
     private FMOD.VECTOR Vector3ToFMODVector(Vector3 v)
     {
         FMOD.VECTOR fmodVector = new FMOD.VECTOR();
-        fmodVector.x = v.x;
-        fmodVector.y = v.y;
-        fmodVector.z = v.z;
-
+        fmodVector.x = v.x *transform.lossyScale.x;
+        fmodVector.y = v.y * transform.lossyScale.y;
+        fmodVector.z = v.z * transform.lossyScale.z;
+            
         return fmodVector;
     }
 
@@ -112,7 +108,7 @@ public class AudioGeometryBox : MonoBehaviour
 
         vertices[0] = Vector3ToFMODVector(meshFilter.mesh.vertices[0]);//(0) -0.5,-0.5
         vertices[1] = Vector3ToFMODVector(meshFilter.mesh.vertices[1]);//(1) 0.5,0.5,0.0
-        vertices[2] = Vector3ToFMODVector(meshFilter.mesh.vertices[2]);//(2)0.5,-0.5
+        vertices[2] = Vector3ToFMODVector(meshFilter.mesh.vertices[2]);//(2) 0.5,-0.5
         vertices[3] = Vector3ToFMODVector(meshFilter.mesh.vertices[3]);//(3)-0.5,0.5
 
         return vertices;
