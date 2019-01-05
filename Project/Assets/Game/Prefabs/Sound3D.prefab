@@ -9,17 +9,17 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1143146919175036}
+  m_RootGameObject: {fileID: 1257452999212340}
   m_IsPrefabAsset: 1
---- !u!1 &1143146919175036
+--- !u!1 &1257452999212340
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4868358217867202}
-  - component: {fileID: 114953569742845454}
+  - component: {fileID: 4846378719837698}
+  - component: {fileID: 114492890965432562}
   m_Layer: 0
   m_Name: Sound3D
   m_TagString: Untagged
@@ -27,30 +27,39 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4868358217867202
+--- !u!4 &4846378719837698
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1143146919175036}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_GameObject: {fileID: 1257452999212340}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114953569742845454
+--- !u!114 &114492890965432562
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1143146919175036}
+  m_GameObject: {fileID: 1257452999212340}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36774fafa1353b048b5938f588096b6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Clip: {fileID: 8300000, guid: 9b388356b3db8f1408f82f488bff66c2, type: 3}
+  Clip: {fileID: 0}
+  Mute: 0
   PlayOnAwake: 1
   Loop: 0
+  Volume: 1
+  Pitch: 1
+  MinDistance: 1
+  MaxDistance: 10000
+  InsideConeAngle: 360
+  OutsideConeAngle: 360
+  OutsideVolume: 1
+  ReverbWet: 0

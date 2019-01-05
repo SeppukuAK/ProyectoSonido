@@ -93,6 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19237fec3bc915844ae962eea4853119, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioPath: Assets/Game/Audio/
 --- !u!114 &114866897389163666
 MonoBehaviour:
   m_ObjectHideFlags: 1
