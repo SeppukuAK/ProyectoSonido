@@ -96,6 +96,8 @@ public class Sound3D : MonoBehaviour
     /// </summary>
     public void Play()
     {
+        CheckState();
+
         if (currentState == SoundState.PLAYING)
             SetMSPosition(0);
 
@@ -109,6 +111,8 @@ public class Sound3D : MonoBehaviour
     /// </summary>
     public void Stop()
     {
+        CheckState();
+
         if (currentState == SoundState.PLAYING || currentState == SoundState.PAUSED)
             LowLevelSystem.ERRCHECK(channel.stop());
     }
@@ -118,6 +122,8 @@ public class Sound3D : MonoBehaviour
     /// </summary>
     public void Pause()
     {
+        CheckState();
+
         if (currentState == SoundState.PLAYING)
             LowLevelSystem.ERRCHECK(channel.setPaused(true));
     }
@@ -127,6 +133,8 @@ public class Sound3D : MonoBehaviour
     /// </summary>
     public void Resume()
     {
+        CheckState();
+
         if (currentState == SoundState.PAUSED)
             LowLevelSystem.ERRCHECK(channel.setPaused(false));
     }
@@ -287,6 +295,7 @@ public class Sound3D : MonoBehaviour
     /// <param name="newFrequency"></param>
     public void SetFrequency(float newFrequency)
     {
+        CheckState();
         frequency = newFrequency;
         LowLevelSystem.ERRCHECK(channel.setFrequency(frequency));
     }
@@ -297,6 +306,7 @@ public class Sound3D : MonoBehaviour
     /// <param name="DSP"></param>
     public void AddDSP(FMOD.DSP DSP)
     {
+        CheckState();
         DSPList.Add(DSP);
         LowLevelSystem.ERRCHECK(channel.addDSP(DSPList.IndexOf(DSP), DSP ));
     }
@@ -307,6 +317,7 @@ public class Sound3D : MonoBehaviour
     /// <param name="position"></param>
     public void SetMSPosition(uint position)
     {
+        CheckState();
         LowLevelSystem.ERRCHECK(channel.setPosition(position, FMOD.TIMEUNIT.MS));
     }
 
@@ -327,6 +338,28 @@ public class Sound3D : MonoBehaviour
     /// Además, si ha acabado un sonido, lo carga de nuevo
     /// </summary>
     private void Update()
+    {
+        CheckState();
+
+        //Update de los atributos
+        SetMuted(Mute);
+        SetLoop(Loop);
+        SetVolume(Volume);
+        SetPitch(Pitch);
+        SetInsideConeAngle(InsideConeAngle);
+        SetOutsideConeAngle(OutsideConeAngle);
+        SetOutsideVolume(OutsideVolume);
+        SetMinDistance(MinDistance);
+        SetMaxDistance(MaxDistance);
+        SetReverbWet(ReverbWet);
+
+        UpdatePosition();
+    }
+
+    /// <summary>
+    /// Actualiza el estado actual del sonido
+    /// </summary>
+    private void CheckState()
     {
         switch (currentState)
         {
@@ -350,22 +383,7 @@ public class Sound3D : MonoBehaviour
                     currentState = SoundState.PLAYING;
 
                 break;
-
         }
-
-        //Update de los atributos
-        SetMuted(Mute);
-        SetLoop(Loop);
-        SetVolume(Volume);
-        SetPitch(Pitch);
-        SetInsideConeAngle(InsideConeAngle);
-        SetOutsideConeAngle(OutsideConeAngle);
-        SetOutsideVolume(OutsideVolume);
-        SetMinDistance(MinDistance);
-        SetMaxDistance(MaxDistance);
-        SetReverbWet(ReverbWet);
-
-        UpdatePosition();
     }
 
     /// <summary>
@@ -373,6 +391,7 @@ public class Sound3D : MonoBehaviour
     /// </summary>
     private void ResetChannel()
     {
+        channel.clearHandle();
         channel = LowLevelSystem.Instance.CreateChannel(sound);
         currentState = SoundState.READY;
         SetFrequency(frequency);
@@ -406,5 +425,11 @@ public class Sound3D : MonoBehaviour
         alt_pan_pos.z = transform.forward.z;
 
         LowLevelSystem.ERRCHECK(channel.set3DAttributes(ref pos, ref vel, ref alt_pan_pos));
+    }
+
+    private void OnDestroy()
+    {
+        channel.stop();
+        channel.clearHandle();
     }
 }

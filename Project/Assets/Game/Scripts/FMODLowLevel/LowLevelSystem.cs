@@ -35,6 +35,8 @@ public class LowLevelSystem : MonoBehaviour
         uint version;
         ERRCHECK(system.getVersion(out version));
         Debug.Log("LowLevelSystem version: " + version);
+
+        ERRCHECK(system.createChannelGroup("master", out masterChannel));
     }
 
     /// <summary>
@@ -217,7 +219,7 @@ public class LowLevelSystem : MonoBehaviour
     /// <param name="result"></param>
     public static void ERRCHECK(FMOD.RESULT result)
     {
-        if (result != FMOD.RESULT.OK)
+        if (result != FMOD.RESULT.OK && result != FMOD.RESULT.ERR_CHANNEL_STOLEN)
             Debug.LogError(result);
     }
 }

@@ -125,4 +125,10 @@ public class Reverb : MonoBehaviour
         LowLevelSystem.ERRCHECK(reverb.setActive(active));
     }
 
+    private void OnDestroy()
+    {
+        reverb.setActive(false);
+        reverb.clearHandle();
+    }
+
 }

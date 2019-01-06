@@ -69,9 +69,17 @@ public class PlayerController : UnityStandardAssets.Characters.FirstPerson.Rigid
     {
         base.FixedUpdate();
 
-        if (m_IsGrounded)      
-            footstepProgress += m_RigidBody.velocity.magnitude;
-        
+        if (m_IsGrounded)
+        {
+            if (Running)
+                footstepProgress += m_RigidBody.velocity.magnitude * 0.75f;
+            else
+                footstepProgress += m_RigidBody.velocity.magnitude;
+
+
+        }
+
+
     }
 
 }

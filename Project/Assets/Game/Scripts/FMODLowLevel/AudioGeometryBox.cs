@@ -45,29 +45,6 @@ public class AudioGeometryBox : MonoBehaviour
         for (int i = 0; i < maxPoligons; i++)
             LowLevelSystem.ERRCHECK(geometry.addPolygon(DirectOcclusion, ReverbOcclusion, DoubleSided, maxVertices, Faces[i], out polygonIndex));
 
-    }
-
-    private void Update()
-    {
-        UpdateGeometryTransform();
-    }
-
-    private void OnDestroy()
-    {
-        geometry.setActive(false);
-    }
-
-    /// <summary>
-    /// Modifica la posicion, rotación y escala al objeto
-    /// </summary>
-    private void UpdateGeometryTransform()
-    {
-        FMOD.VECTOR pos = new FMOD.VECTOR();
-        pos.x = transform.position.x;
-        pos.y = transform.position.y;
-        pos.z = transform.position.z;
-
-        LowLevelSystem.ERRCHECK(geometry.setPosition(ref pos));
 
         FMOD.VECTOR forward = new FMOD.VECTOR();
         forward.x = transform.forward.x;
@@ -83,6 +60,30 @@ public class AudioGeometryBox : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+        UpdateGeometryTransform();
+    }
+
+    private void OnDestroy()
+    {
+        geometry.setActive(false);
+        geometry.clearHandle();
+    }
+
+    /// <summary>
+    /// Modifica la posicion, rotación y escala al objeto
+    /// </summary>
+    private void UpdateGeometryTransform()
+    {
+        FMOD.VECTOR pos = new FMOD.VECTOR();
+        pos.x = transform.position.x;
+        pos.y = transform.position.y;
+        pos.z = transform.position.z;
+
+        LowLevelSystem.ERRCHECK(geometry.setPosition(ref pos));
+    }
+
     /// <summary>
     /// Realiza la conversión de Vector3 a FMOD.VECTOR
     /// </summary>
@@ -93,7 +94,7 @@ public class AudioGeometryBox : MonoBehaviour
         FMOD.VECTOR fmodVector = new FMOD.VECTOR();
         fmodVector.x = v.x *transform.lossyScale.x;
         fmodVector.y = v.y * transform.lossyScale.y;
-        fmodVector.z = v.z * transform.lossyScale.z;
+        fmodVector.z =0;
             
         return fmodVector;
     }
