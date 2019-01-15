@@ -6,25 +6,26 @@
 /// </summary>
 public class Reverb : MonoBehaviour
 {
+    /// <summary>
+    /// Presets disponibles
+    /// </summary>
     private enum Presets { ALLEY, ARENA, AUDITORIUM, BATHROOM, CARPETTEDHALLWAY, CAVE, CITY, CONCERTHALL, FOREST, GENERIC, HALLWAY, HANGAR, LIVINGROOM, MOUNTAINS, OFF, PADDEDCELL, PARKINGLOT, PLAIN, QUARRY, ROOM, SEWERPIPE, STONECORRIDOR, STONEROOM, UNDERWATER, NONE };
 
+    [SerializeField] private Presets preset = Presets.NONE;
+
+    [Header ("Zones of influence")]
     [SerializeField] private SphereCollider minSphere;
     [SerializeField] private SphereCollider maxSphere;
 
-    /// <summary>
-    /// Preset inicial
-    /// </summary>
-    [SerializeField] private Presets preset = Presets.NONE;
-
     private FMOD.Reverb3D reverb;
-    private FMOD.REVERB_PROPERTIES reverbProperties;
 
     /// <summary>
-    /// Crea la reverb y establece el preset inicial
+    /// Crea la reverb y establece el preset
     /// </summary>
     private void Start()
     {
         reverb = LowLevelSystem.Instance.CreateReverb();
+        FMOD.REVERB_PROPERTIES reverbProperties = new FMOD.REVERB_PROPERTIES();
 
         switch (preset)
         {
@@ -101,13 +102,26 @@ public class Reverb : MonoBehaviour
                 reverbProperties = FMOD.PRESET.UNDERWATER();
                 break;
             case Presets.NONE:
-                reverbProperties = new FMOD.REVERB_PROPERTIES();
                 break;
         }
 
-
         LowLevelSystem.ERRCHECK(reverb.setProperties(ref reverbProperties));
+    }
 
+    /// <summary>
+    /// Desactiva la reverb
+    /// </summary>
+    private void OnDestroy()
+    {
+        SetActive(false);
+        reverb.clearHandle();
+    }
+
+    /// <summary>
+    /// Actualiza la posición de la reverb y su radio
+    /// </summary>
+    private void FixedUpdate()
+    {
         FMOD.VECTOR pos = new FMOD.VECTOR();
         pos.x = transform.position.x;
         pos.y = transform.position.y;
@@ -117,18 +131,11 @@ public class Reverb : MonoBehaviour
     }
 
     /// <summary>
-    /// Activa/desactive la reverb
+    /// Activa/desactiva la reverb
     /// </summary>
     /// <param name="active"></param>
-    public void Active(bool active)
+    public void SetActive(bool active)
     {
         LowLevelSystem.ERRCHECK(reverb.setActive(active));
     }
-
-    private void OnDestroy()
-    {
-        reverb.setActive(false);
-        reverb.clearHandle();
-    }
-
 }

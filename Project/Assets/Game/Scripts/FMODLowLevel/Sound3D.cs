@@ -20,7 +20,7 @@ public class Sound3D : MonoBehaviour
     public bool Mute = false;
     public bool PlayOnAwake = true;
     public bool Loop = false;
-    
+
     [Range(0f, 1f)] public float Volume = 1f;
     [Range(0f, 6f)] public float Pitch = 1f;
 
@@ -36,7 +36,6 @@ public class Sound3D : MonoBehaviour
     [Header("Reverb Properties")]
     public float ReverbWet;
 
-    private float frequency;
     private List<FMOD.DSP> DSPList;
 
     /// <summary>
@@ -55,11 +54,6 @@ public class Sound3D : MonoBehaviour
     private SoundState currentState;
 
     /// <summary>
-    /// Posición en el anterior frame del sonido
-    /// </summary>
-    private FMOD.VECTOR lastPos;
-
-    /// <summary>
     /// Carga el sonido, crea el canal, inicializa su estado
     /// </summary>
     private void Start()
@@ -68,18 +62,21 @@ public class Sound3D : MonoBehaviour
         channel = LowLevelSystem.Instance.CreateChannel(sound);
         currentState = SoundState.READY;
         DSPList = new List<FMOD.DSP>();
-       
-        lastPos = new FMOD.VECTOR();
-        lastPos.x = transform.position.x;
-        lastPos.y = transform.position.y;
-        lastPos.z = transform.position.z;
-        
-        LowLevelSystem.ERRCHECK(channel.getFrequency(out frequency));
 
         if (PlayOnAwake)
             StartCoroutine(PlayOnAwakeDelay());
     }
-    
+
+    /// <summary>
+    /// Para el canal asociado y libera el handle
+    /// </summary>
+    private void OnDestroy()
+    {
+        channel.stop();
+        channel.clearHandle();
+        sound.clearHandle();
+    }
+
     /// <summary>
     /// Delay para que le de tiempo a que le afecte el escenario
     /// </summary>
@@ -277,6 +274,7 @@ public class Sound3D : MonoBehaviour
 
     /// <summary>
     /// Establece la Distancia a partir de la cual el sonido no se atenúa más
+    /// Asumo que hay que pasar 0
     /// </summary>
     /// <param name="maxDistance"></param>
     private void SetReverbWet(float reverbWet)
@@ -290,17 +288,6 @@ public class Sound3D : MonoBehaviour
     #region Setters
 
     /// <summary>
-    /// Establece la frecuencia del sonido
-    /// </summary>
-    /// <param name="newFrequency"></param>
-    public void SetFrequency(float newFrequency)
-    {
-        CheckState();
-        frequency = newFrequency;
-        LowLevelSystem.ERRCHECK(channel.setFrequency(frequency));
-    }
-
-    /// <summary>
     /// Añade un DSP al canal
     /// </summary>
     /// <param name="DSP"></param>
@@ -308,7 +295,7 @@ public class Sound3D : MonoBehaviour
     {
         CheckState();
         DSPList.Add(DSP);
-        LowLevelSystem.ERRCHECK(channel.addDSP(DSPList.IndexOf(DSP), DSP ));
+        LowLevelSystem.ERRCHECK(channel.addDSP(DSPList.IndexOf(DSP), DSP));
     }
 
     /// <summary>
@@ -337,7 +324,7 @@ public class Sound3D : MonoBehaviour
     /// Controla el flujo de estados
     /// Además, si ha acabado un sonido, lo carga de nuevo
     /// </summary>
-    private void Update()
+    private void FixedUpdate()
     {
         CheckState();
 
@@ -354,6 +341,7 @@ public class Sound3D : MonoBehaviour
         SetReverbWet(ReverbWet);
 
         UpdatePosition();
+
     }
 
     /// <summary>
@@ -394,19 +382,22 @@ public class Sound3D : MonoBehaviour
         channel.clearHandle();
         channel = LowLevelSystem.Instance.CreateChannel(sound);
         currentState = SoundState.READY;
-        SetFrequency(frequency);
 
         //Se vuelven a añadir todos los efectos al canal
-        foreach (FMOD.DSP dsp in DSPList)      
+        foreach (FMOD.DSP dsp in DSPList)
             LowLevelSystem.ERRCHECK(channel.addDSP(DSPList.IndexOf(dsp), dsp));
-        
+
     }
 
     /// <summary>
     /// Actualiza la posición y la velocidad del sonido a la del objeto
+    /// Actualiza la orientación del sonido
     /// </summary>
     private void UpdatePosition()
     {
+        FMOD.VECTOR lastPos, lastVel, alt_pan_pos;
+        LowLevelSystem.ERRCHECK(channel.get3DAttributes(out lastPos,out lastVel, out alt_pan_pos));
+
         FMOD.VECTOR pos = new FMOD.VECTOR();
         pos.x = transform.position.x;
         pos.y = transform.position.y;
@@ -417,19 +408,14 @@ public class Sound3D : MonoBehaviour
         vel.y = (pos.y - lastPos.y) * Time.deltaTime;
         vel.z = (pos.z - lastPos.z) * Time.deltaTime;
 
-        lastPos = pos;
-
-        FMOD.VECTOR alt_pan_pos = new FMOD.VECTOR(); // vector up: hacia la ``coronilla''
-        alt_pan_pos.x = transform.forward.x;
-        alt_pan_pos.y = transform.forward.y;
-        alt_pan_pos.z = transform.forward.z;
-
         LowLevelSystem.ERRCHECK(channel.set3DAttributes(ref pos, ref vel, ref alt_pan_pos));
+
+        FMOD.VECTOR forward = new FMOD.VECTOR();
+        forward.x = transform.forward.x;
+        forward.y = transform.forward.y;
+        forward.z = transform.forward.z;
+
+        LowLevelSystem.ERRCHECK(channel.set3DConeOrientation(ref forward));
     }
 
-    private void OnDestroy()
-    {
-        channel.stop();
-        channel.clearHandle();
-    }
 }

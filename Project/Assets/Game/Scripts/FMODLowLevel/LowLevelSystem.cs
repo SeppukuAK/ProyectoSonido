@@ -3,9 +3,11 @@
 /// <summary>
 /// Motor de audio que permite el posicionamiento 3D, geometría y reverbs
 /// Inicializa la librería. Se encarga de cargar y reproducir sonidos.
+/// Persistente entre escenas
 /// </summary>
 public class LowLevelSystem : MonoBehaviour
 {
+    /// PersistentSingleton
     public static LowLevelSystem Instance;
 
     /// <summary>
@@ -25,41 +27,50 @@ public class LowLevelSystem : MonoBehaviour
 
     /// <summary>
     /// Obtiene la instancia del LowLevelSystem
+    /// Obtiene la referencia al MasterChannel
+    /// PersistentSingleton
     /// </summary>
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
 
-        //LowLevel
-        system = FMODUnity.RuntimeManager.LowlevelSystem;
-        uint version;
-        ERRCHECK(system.getVersion(out version));
-        Debug.Log("LowLevelSystem version: " + version);
+            system = FMODUnity.RuntimeManager.LowlevelSystem;
+            uint version;
+            ERRCHECK(system.getVersion(out version));
+            Debug.Log("LowLevelSystem version: " + version);
 
-        ERRCHECK(system.createChannelGroup("master", out masterChannel));
+            ERRCHECK(system.getMasterChannelGroup(out masterChannel));
+        }
+        else
+            Destroy(gameObject);
     }
 
     /// <summary>
-    /// TODO: Update del system. Revisar si hace falta
+    /// Update del system.
     /// </summary>
-    private void Update()
+    private void FixedUpdate()
     {
         ERRCHECK(system.update());
     }
 
+    #region Creates
     /// <summary>
     /// Crea un sonido 3D
+    /// TODO: Solo va con .wav
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
     public FMOD.Sound Create3DSound(string name)
     {
         FMOD.Sound sound;
-        //TODO: Solo va con .wav
         ERRCHECK(system.createSound(audioPath + name + ".wav", FMOD.MODE._3D | FMOD.MODE.LOOP_NORMAL, out sound));
 
         return sound;
     }
+
     /// <summary>
     /// Crea un canal asociado al sonido
     /// Arranca en pause para dejarlo disponible en memoria
@@ -80,17 +91,18 @@ public class LowLevelSystem : MonoBehaviour
         return channel;
     }
 
-    /// <summary>
-    /// Crea un grupo de canales con un nombre
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public FMOD.ChannelGroup CreateChannelGroup(string name)
-    {
-        FMOD.ChannelGroup channelGroup;
-        ERRCHECK(system.createChannelGroup(name, out channelGroup));
-        return channelGroup;
-    }
+    ///// <summary>
+    ///TODO: ChannelGroup
+    ///// Crea un grupo de canales con un nombre
+    ///// </summary>
+    ///// <param name="name"></param>
+    ///// <returns></returns>
+    //public FMOD.ChannelGroup CreateChannelGroup(string name)
+    //{
+    //    FMOD.ChannelGroup channelGroup;
+    //    ERRCHECK(system.createChannelGroup(name, out channelGroup));
+    //    return channelGroup;
+    //}
 
     /// <summary>
     /// Crea una reverb
@@ -121,14 +133,16 @@ public class LowLevelSystem : MonoBehaviour
     /// </summary>
     /// <param name="DSPType"></param>
     /// <returns></returns>
-    public FMOD.DSP CreateDSP(FMOD.DSP_TYPE DSPType)
+    public FMOD.DSP CreateDSPByType(FMOD.DSP_TYPE DSPType)
     {
         FMOD.DSP dsp;
         ERRCHECK(system.createDSPByType(DSPType, out dsp));
         return dsp;
     }
 
-    #region System parameters
+    #endregion Creates
+
+    #region System_parameters
 
     /// <summary>
     /// Devuelve la variación de frecuencia por la velocidad
@@ -211,7 +225,7 @@ public class LowLevelSystem : MonoBehaviour
         ERRCHECK(system.set3DSettings(GetDopplerScale(), GetDistanceFactor(), rollOffScale));
     }
 
-    #endregion System parameters
+    #endregion System_parameters
 
     /// <summary>
     /// Facilita la gestión de errores
@@ -219,6 +233,7 @@ public class LowLevelSystem : MonoBehaviour
     /// <param name="result"></param>
     public static void ERRCHECK(FMOD.RESULT result)
     {
+        //TODO: CHANNEL_STOLEN
         if (result != FMOD.RESULT.OK && result != FMOD.RESULT.ERR_CHANNEL_STOLEN)
             Debug.LogError(result);
     }

@@ -4,26 +4,26 @@
 /// Simulación de recintos acústicos con obstrucción, oclusión, etc.
 /// </summary>
 [RequireComponent(typeof(MeshFilter))]
-public class AudioGeometryBox : MonoBehaviour
+public class AudioGeometry : MonoBehaviour
 {
-    //Oclusión: emisor y oyente el distinto recinto
-    //todas las ondas están atenuadas y filtradas
-
-    public float DirectOcclusion;// 0.0 no atenua, 1.0 atenua totalmente
-    public float ReverbOcclusion;// atenuacion de la reverberacion
-    public bool DoubleSided; // atenua por ambos lados o no 
+    [Tooltip("0.0 no atenua, 1.0 atenua totalmente")] [Range(0f, 1f)] public float DirectOcclusion;
+    [Tooltip("Atenuacion de la reverberacion")] public float ReverbOcclusion;
+    [Tooltip("Atenua por ambos lados o no ")] public bool DoubleSided; 
 
     private FMOD.Geometry geometry;
     private int maxPoligons, maxVertices;
     private MeshFilter meshFilter;
 
+    /// <summary>
+    /// Obtiene referencias
+    /// </summary>
     private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
     }
 
     /// <summary>
-    /// Se crea la geometría del cubo
+    /// Se crea la geometría del quad
     /// </summary>
     private void Start()
     {
@@ -60,11 +60,9 @@ public class AudioGeometryBox : MonoBehaviour
 
     }
 
-    private void Update()
-    {
-        UpdateGeometryTransform();
-    }
-
+    /// <summary>
+    /// Desactiva la geometría y limpia el handle
+    /// </summary>
     private void OnDestroy()
     {
         geometry.setActive(false);
@@ -72,7 +70,15 @@ public class AudioGeometryBox : MonoBehaviour
     }
 
     /// <summary>
-    /// Modifica la posicion, rotación y escala al objeto
+    /// Actualiza el transform
+    /// </summary>
+    private void FixedUpdate()
+    {
+        UpdateGeometryTransform();
+    }
+
+    /// <summary>
+    /// Modifica la posicion
     /// </summary>
     private void UpdateGeometryTransform()
     {
@@ -92,21 +98,21 @@ public class AudioGeometryBox : MonoBehaviour
     private FMOD.VECTOR Vector3ToFMODVector(Vector3 v)
     {
         FMOD.VECTOR fmodVector = new FMOD.VECTOR();
-        fmodVector.x = v.x *transform.lossyScale.x;
+        fmodVector.x = v.x * transform.lossyScale.x;
         fmodVector.y = v.y * transform.lossyScale.y;
-        fmodVector.z =0;
-            
+        fmodVector.z = 0;
+
         return fmodVector;
     }
 
     /// <summary>
-    /// Devuelve los vértices del cubo
+    /// Devuelve los vértices del quad
     /// </summary>
     /// <returns></returns>
     private FMOD.VECTOR[] GetColliderVertexPositions()
     {
         FMOD.VECTOR[] vertices = new FMOD.VECTOR[4];
-
+       
         vertices[0] = Vector3ToFMODVector(meshFilter.mesh.vertices[0]);//(0) -0.5,-0.5
         vertices[1] = Vector3ToFMODVector(meshFilter.mesh.vertices[1]);//(1) 0.5,0.5,0.0
         vertices[2] = Vector3ToFMODVector(meshFilter.mesh.vertices[2]);//(2) 0.5,-0.5

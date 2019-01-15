@@ -5,29 +5,38 @@ public class TestSound : MonoBehaviour
     public Sound3D MySound;
     AudioSource AudioSource;
 
+    float volume = 1.0f;
 
+    /// <summary>
+    /// Añade un efecto de sonido de radio: Distorsión + filtro paso alto
+    /// </summary>
     private void AddEfect()
     {
-        FMOD.DSP dsp = LowLevelSystem.Instance.CreateDSP(FMOD.DSP_TYPE.ECHO);
+        FMOD.DSP distortion;
+        distortion = LowLevelSystem.Instance.CreateDSPByType(FMOD.DSP_TYPE.DISTORTION);
+        LowLevelSystem.ERRCHECK(distortion.setParameterFloat((int)FMOD.DSP_DISTORTION.LEVEL, 0.85f));         // parametros del efecto
+
+        FMOD.DSP highpass;
+        highpass = LowLevelSystem.Instance.CreateDSPByType(FMOD.DSP_TYPE.HIGHPASS);
+        LowLevelSystem.ERRCHECK(highpass.setParameterFloat((int)FMOD.DSP_HIGHPASS.CUTOFF,2000f));         // parametros del efecto
 
         // apliacion a un canal (puede aplicarse a un grupo o al sistema)
-        MySound.AddDSP(dsp);
-
-        // parametros del efecto
-        //  dsp.setParameterFloat((int)FMOD.DSP_ECHO.DELAY, 0.02f);
+        MySound.AddDSP(distortion);
+        MySound.AddDSP(highpass);
     }
+
     void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.I))
             MySound.Play();
-        else if (Input.GetKeyDown(KeyCode.W))
+        else if (Input.GetKeyDown(KeyCode.O))
             MySound.Pause();
-        else if (Input.GetKeyDown(KeyCode.E))
+        else if (Input.GetKeyDown(KeyCode.P))
             MySound.Resume();
-        else if (Input.GetKeyDown(KeyCode.R))
+        else if (Input.GetKeyDown(KeyCode.K))
             MySound.Stop();
-        else if (Input.GetKeyDown(KeyCode.D))
+
+        else if (Input.GetKeyDown(KeyCode.U))
             AddEfect();
 
     }
