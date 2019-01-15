@@ -1,31 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    [SerializeField] private int totalObjectives;
-
-    [SerializeField] private Text progressText;
-
-    public int Progress
-    {
-        get { return progress; }
-        set
-        {
-            progress = value;
-            if (progress == totalObjectives)
-                SceneManager.LoadScene("WinScene");
-
-            progressText.text = "Progress: " + progress + "/" + totalObjectives;
-        }
-    }
-    private int progress;
-
+    /// <summary>
+    /// Persistent Singleton
+    /// </summary>
     private void Awake()
     {
         if (Instance == null)
@@ -37,9 +19,21 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
     }
 
-    private void Start()
+    /// <summary>
+    /// Sale de la aplicación si le das a escape
+    /// </summary>
+    private void Update()
     {
-        Progress = 0;
+        //    if (Input.GetKeyDown(KeyCode.Escape))
+        //        ExitApplication();
+    }
+
+    /// <summary>
+    /// Resetea el juego
+    /// </summary>
+    public void ResetGame()
+    {
+        SceneManager.LoadScene("Game");
     }
 
     /// <summary>

@@ -14,4 +14,9 @@ public class MenuManager : MonoBehaviour
     {
         GameManager.Instance.ExitApplication();
     }
+
+    public void ResetGame()
+    {
+        GameManager.Instance.ResetGame();
+    }
 }

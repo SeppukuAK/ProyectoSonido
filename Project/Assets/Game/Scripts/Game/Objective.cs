@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Objective : MonoBehaviour {
 
@@ -8,7 +6,7 @@ public class Objective : MonoBehaviour {
     {
         if (other.GetComponent<PlayerController>())
         {
-            GameManager.Instance.Progress++;
+            LevelManager.Instance.Progress++;
             Destroy(gameObject);
         }
     }
