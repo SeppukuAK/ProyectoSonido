@@ -11,10 +11,7 @@ public class Sound3D : MonoBehaviour
 {
     private enum SoundState { READY, PLAYING, PAUSED }
 
-    /// <summary>
-    /// Pista de audio que reproduce
-    /// </summary>
-    public AudioClip Clip;
+    public AudioClip Clip; // Pista de audio que reproduce
 
     //Atributos del canal
     public bool Mute = false;
@@ -36,8 +33,6 @@ public class Sound3D : MonoBehaviour
     [Header("Reverb Properties")]
     public float ReverbWet;
 
-    private List<FMOD.DSP> DSPList;
-
     /// <summary>
     /// Unifica el tratamiento de los diferentes formatos de sonido
     /// </summary>
@@ -54,6 +49,11 @@ public class Sound3D : MonoBehaviour
     private SoundState currentState;
 
     /// <summary>
+    /// Lista con todos los DSPs aplicados al canal
+    /// </summary>
+    private List<FMOD.DSP> DSPList;
+
+    /// <summary>
     /// Carga el sonido, crea el canal, inicializa su estado
     /// </summary>
     private void Start()
@@ -68,6 +68,16 @@ public class Sound3D : MonoBehaviour
     }
 
     /// <summary>
+    /// Delay para que le de tiempo a que le afecte el escenario
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator PlayOnAwakeDelay()
+    {
+        yield return new WaitForSeconds(0.5f);
+        Play();
+    }
+
+    /// <summary>
     /// Para el canal asociado y libera el handle
     /// </summary>
     private void OnDestroy()
@@ -77,17 +87,8 @@ public class Sound3D : MonoBehaviour
         sound.clearHandle();
     }
 
-    /// <summary>
-    /// Delay para que le de tiempo a que le afecte el escenario
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator PlayOnAwakeDelay()
-    {
-        yield return new WaitForSeconds(0.1f);
-        Play();
-    }
-
     #region Flow
+
     /// <summary>
     /// Reproduce el sonido
     /// </summary>
@@ -98,7 +99,7 @@ public class Sound3D : MonoBehaviour
         if (currentState == SoundState.PLAYING)
             SetMSPosition(0);
 
-        else if (currentState == SoundState.PAUSED || currentState == SoundState.READY)
+        else 
             LowLevelSystem.ERRCHECK(channel.setPaused(false));
     }
 
@@ -110,7 +111,7 @@ public class Sound3D : MonoBehaviour
     {
         CheckState();
 
-        if (currentState == SoundState.PLAYING || currentState == SoundState.PAUSED)
+        if (currentState != SoundState.READY)
             LowLevelSystem.ERRCHECK(channel.stop());
     }
 
@@ -180,7 +181,7 @@ public class Sound3D : MonoBehaviour
     /// Silencia el sonido o le pone volumen previo a ser muteado
     /// </summary>
     /// <param name="muted"></param>
-    private void SetMuted(bool muted)
+    private void UpdateMute(bool muted)
     {
         Mute = muted;
         LowLevelSystem.ERRCHECK(channel.setMute(Mute));
@@ -191,7 +192,7 @@ public class Sound3D : MonoBehaviour
     /// -1 para infinito
     /// </summary>
     /// <param name="loop"></param>
-    private void SetLoop(bool loop)
+    private void UpdateLoop(bool loop)
     {
         Loop = loop;
 
@@ -206,7 +207,7 @@ public class Sound3D : MonoBehaviour
     /// Valor entre 0.0 y 1.0
     /// </summary>
     /// <param name="volume"></param>
-    private void SetVolume(float volume)
+    private void UpdateVolume(float volume)
     {
         Volume = volume;
         LowLevelSystem.ERRCHECK(channel.setVolume(Volume));
@@ -216,7 +217,7 @@ public class Sound3D : MonoBehaviour
     /// Establece el pitch del sonido
     /// </summary>
     /// <param name="pitch"></param>
-    private void SetPitch(float pitch)
+    private void UpdatePitch(float pitch)
     {
         Pitch = pitch;
         LowLevelSystem.ERRCHECK(channel.setPitch(Pitch));
@@ -224,50 +225,27 @@ public class Sound3D : MonoBehaviour
 
     /// <summary>
     /// Establece el angulo del cono interior: donde no hay atenuación por dirección
-    /// </summary>
-    /// <param name="insideConeAngle"></param>
-    private void SetInsideConeAngle(float insideConeAngle)
-    {
-        InsideConeAngle = insideConeAngle;
-        LowLevelSystem.ERRCHECK(channel.set3DConeSettings(InsideConeAngle, OutsideConeAngle, OutsideVolume));
-    }
-
-    /// <summary>
     /// Establece el ángulo del cono exterior: donde el sonido se atenúa
-    /// </summary>
-    /// <param name="outsideConeAngle"></param>
-    private void SetOutsideConeAngle(float outsideConeAngle)
-    {
-        OutsideConeAngle = outsideConeAngle;
-        LowLevelSystem.ERRCHECK(channel.set3DConeSettings(InsideConeAngle, OutsideConeAngle, OutsideVolume));
-    }
-
-    /// <summary>
     /// Establece el volumen fuera del cono exterior
     /// </summary>
-    /// <param name="outsideVolume"></param>
-    private void SetOutsideVolume(float outsideVolume)
+    /// <param name="insideConeAngle"></param>
+    private void UpdateConeSettings(float insideConeAngle, float outsideConeAngle, float outsideVolume)
     {
+        InsideConeAngle = insideConeAngle;
+        OutsideConeAngle = outsideConeAngle;
         OutsideVolume = outsideVolume;
+
         LowLevelSystem.ERRCHECK(channel.set3DConeSettings(InsideConeAngle, OutsideConeAngle, OutsideVolume));
     }
 
     /// <summary>
     /// Establece la Distancia a partir de la cual el sonido empieza a atenuarse
-    /// </summary>
-    /// <param name="minDistance"></param>
-    private void SetMinDistance(float minDistance)
-    {
-        MinDistance = minDistance;
-        LowLevelSystem.ERRCHECK(channel.set3DMinMaxDistance(MinDistance, MaxDistance));
-    }
-
-    /// <summary>
     /// Establece la Distancia a partir de la cual el sonido no se atenúa más
     /// </summary>
-    /// <param name="maxDistance"></param>
-    private void SetMaxDistance(float maxDistance)
+    /// <param name="minDistance"></param>
+    private void UpdateMinMaxDistance(float minDistance, float maxDistance)
     {
+        MinDistance = minDistance;
         MaxDistance = maxDistance;
         LowLevelSystem.ERRCHECK(channel.set3DMinMaxDistance(MinDistance, MaxDistance));
     }
@@ -277,7 +255,7 @@ public class Sound3D : MonoBehaviour
     /// Asumo que hay que pasar 0
     /// </summary>
     /// <param name="maxDistance"></param>
-    private void SetReverbWet(float reverbWet)
+    private void UpdateReverbWet(float reverbWet)
     {
         ReverbWet = reverbWet;
         LowLevelSystem.ERRCHECK(channel.setReverbProperties(0, ReverbWet));
@@ -308,40 +286,37 @@ public class Sound3D : MonoBehaviour
         LowLevelSystem.ERRCHECK(channel.setPosition(position, FMOD.TIMEUNIT.MS));
     }
 
-    /// <summary>
-    /// TODO: Revisar
-    /// Asocia el canal a un grupo
-    /// </summary>
-    /// <param name="channelGroup"></param>
-    public void SetChannelGroup(FMOD.ChannelGroup channelGroup)
-    {
-        LowLevelSystem.ERRCHECK(channel.setChannelGroup(channelGroup));
-    }
+    ///// <summary>
+    ///// TODO: Revisar
+    ///// Asocia el canal a un grupo
+    ///// </summary>
+    ///// <param name="channelGroup"></param>
+    //public void SetChannelGroup(FMOD.ChannelGroup channelGroup)
+    //{
+    //    LowLevelSystem.ERRCHECK(channel.setChannelGroup(channelGroup));
+    //}
 
     #endregion Setters
 
     /// <summary>
     /// Controla el flujo de estados
     /// Además, si ha acabado un sonido, lo carga de nuevo
+    /// Updatea los atributos
     /// </summary>
     private void FixedUpdate()
     {
         CheckState();
 
         //Update de los atributos
-        SetMuted(Mute);
-        SetLoop(Loop);
-        SetVolume(Volume);
-        SetPitch(Pitch);
-        SetInsideConeAngle(InsideConeAngle);
-        SetOutsideConeAngle(OutsideConeAngle);
-        SetOutsideVolume(OutsideVolume);
-        SetMinDistance(MinDistance);
-        SetMaxDistance(MaxDistance);
-        SetReverbWet(ReverbWet);
+        UpdateMute(Mute);
+        UpdateLoop(Loop);
+        UpdateVolume(Volume);
+        UpdatePitch(Pitch);
+        UpdateConeSettings(InsideConeAngle,OutsideConeAngle,OutsideVolume);
+        UpdateMinMaxDistance(MinDistance,MaxDistance);
+        UpdateReverbWet(ReverbWet);
 
         UpdatePosition();
-
     }
 
     /// <summary>

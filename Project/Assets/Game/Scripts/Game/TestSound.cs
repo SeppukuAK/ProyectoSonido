@@ -5,8 +5,6 @@ public class TestSound : MonoBehaviour
     public Sound3D MySound;
     AudioSource AudioSource;
 
-    float volume = 1.0f;
-
     /// <summary>
     /// Añade un efecto de sonido de radio: Distorsión + filtro paso alto
     /// </summary>
@@ -38,6 +36,5 @@ public class TestSound : MonoBehaviour
 
         else if (Input.GetKeyDown(KeyCode.U))
             AddEfect();
-
     }
 }

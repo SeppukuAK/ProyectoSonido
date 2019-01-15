@@ -11,9 +11,7 @@ Channel group lo dejamos para más tarde
 30 -> Modelos de atenuación: RollOff
 35 -> Cosas rarisimas de reverb y convolución
 
-Revisar todos los setters + lista de dsps
-revisar el flujo
 Revisar geometría. A ver si lo arreglas
-
+FADE
 
 UNITY_EDITOR

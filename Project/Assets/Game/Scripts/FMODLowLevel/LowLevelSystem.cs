@@ -228,6 +228,18 @@ public class LowLevelSystem : MonoBehaviour
     #endregion System_parameters
 
     /// <summary>
+    /// Devuelve el sampleRate
+    /// </summary>
+    /// <returns></returns>
+    public int GetSampleRate()
+    {
+        int sampleRate, numRawSpeakers;
+        FMOD.SPEAKERMODE speakerMode;
+        ERRCHECK(system.getSoftwareFormat(out sampleRate, out speakerMode, out numRawSpeakers));
+        return sampleRate;
+    }
+
+    /// <summary>
     /// Facilita la gestión de errores
     /// </summary>
     /// <param name="result"></param>
