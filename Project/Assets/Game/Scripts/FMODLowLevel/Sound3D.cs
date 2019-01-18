@@ -286,16 +286,6 @@ public class Sound3D : MonoBehaviour
         LowLevelSystem.ERRCHECK(channel.setPosition(position, FMOD.TIMEUNIT.MS));
     }
 
-    ///// <summary>
-    ///// TODO: Revisar
-    ///// Asocia el canal a un grupo
-    ///// </summary>
-    ///// <param name="channelGroup"></param>
-    //public void SetChannelGroup(FMOD.ChannelGroup channelGroup)
-    //{
-    //    LowLevelSystem.ERRCHECK(channel.setChannelGroup(channelGroup));
-    //}
-
     #endregion Setters
 
     /// <summary>

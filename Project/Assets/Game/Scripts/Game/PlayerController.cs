@@ -44,26 +44,26 @@ public class PlayerController : UnityStandardAssets.Characters.FirstPerson.Rigid
             }
         }
 
-        CheckInteraction();
+        //CheckInteraction();
     }
 
-    private void CheckInteraction()
-    {
-        if (CrossPlatformInputManager.GetButtonDown("Interact"))
-        {
-            RaycastHit hit;
-            // Does the ray intersect any objects excluding the player layer
-            if (Physics.Raycast(cam.transform.position, transform.TransformDirection(Vector3.forward), out hit, 3f))
-            {
-                if (hit.collider.GetComponent<Interactable>())
-                {
-                    hit.collider.GetComponent<Interactable>().Interact();
-                    Debug.Log("Did Hit");
-                }
-            }
-        }
+    //private void CheckInteraction()
+    //{
+    //    if (CrossPlatformInputManager.GetButtonDown("Interact"))
+    //    {
+    //        RaycastHit hit;
+    //        // Does the ray intersect any objects excluding the player layer
+    //        if (Physics.Raycast(cam.transform.position, transform.TransformDirection(Vector3.forward), out hit, 3f))
+    //        {
+    //            if (hit.collider.GetComponent<Interactable>())
+    //            {
+    //                hit.collider.GetComponent<Interactable>().Interact();
+    //                Debug.Log("Did Hit");
+    //            }
+    //        }
+    //    }
 
-    }
+    //}
 
     protected override void FixedUpdate()
     {
@@ -81,5 +81,4 @@ public class PlayerController : UnityStandardAssets.Characters.FirstPerson.Rigid
 
 
     }
-
 }

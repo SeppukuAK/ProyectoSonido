@@ -91,19 +91,6 @@ public class LowLevelSystem : MonoBehaviour
         return channel;
     }
 
-    ///// <summary>
-    ///TODO: ChannelGroup
-    ///// Crea un grupo de canales con un nombre
-    ///// </summary>
-    ///// <param name="name"></param>
-    ///// <returns></returns>
-    //public FMOD.ChannelGroup CreateChannelGroup(string name)
-    //{
-    //    FMOD.ChannelGroup channelGroup;
-    //    ERRCHECK(system.createChannelGroup(name, out channelGroup));
-    //    return channelGroup;
-    //}
-
     /// <summary>
     /// Crea una reverb
     /// </summary>
@@ -245,7 +232,6 @@ public class LowLevelSystem : MonoBehaviour
     /// <param name="result"></param>
     public static void ERRCHECK(FMOD.RESULT result)
     {
-        //TODO: CHANNEL_STOLEN
         if (result != FMOD.RESULT.OK && result != FMOD.RESULT.ERR_CHANNEL_STOLEN)
             Debug.LogError(result);
     }

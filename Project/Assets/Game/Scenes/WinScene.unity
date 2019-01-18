@@ -123,7 +123,7 @@ GameObject:
   - component: {fileID: 481017321}
   - component: {fileID: 481017320}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: MenuManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

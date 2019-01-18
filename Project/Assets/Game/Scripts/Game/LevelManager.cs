@@ -14,6 +14,7 @@ public class LevelManager : MonoBehaviour
 
     [Header ("References")]
     [SerializeField] private Enemy enemy;
+    [SerializeField] private PlayerController player;
     [SerializeField] private Text progressText;
     [SerializeField] private Objective objectivePrefab;
     [SerializeField] private Trap trapPrefab;
@@ -69,7 +70,9 @@ public class LevelManager : MonoBehaviour
             int row = Random.Range(0, mazeRows);
             int col = Random.Range(0, mazeCols);
 
-            Instantiate(trapPrefab, new Vector3(col * ModuleSize, 0.01f, -row * ModuleSize), trapPrefab.transform.rotation).Init(enemy);
+            Instantiate(trapPrefab, new Vector3(col * ModuleSize, -0.2f, -row * ModuleSize), trapPrefab.transform.rotation).Init(enemy);
         }
+
+        enemy.Init(player.transform);
     }
 }

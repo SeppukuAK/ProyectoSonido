@@ -24,8 +24,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        //    if (Input.GetKeyDown(KeyCode.Escape))
-        //        ExitApplication();
+        if (Input.GetKeyDown(KeyCode.Escape))
+            ExitApplication();
     }
 
     /// <summary>
@@ -41,9 +41,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void ExitApplication()
     {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
+#if !UNITY_EDITOR
         Application.Quit();
 #endif
     }
